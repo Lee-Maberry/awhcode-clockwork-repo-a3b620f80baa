@@ -1,0 +1,75 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js" ></script>
+<script>
+    $(document).ready(function () {
+        loadTimes();
+
+    });
+    function UserAction() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var obj = JSON.parse(this.responseText); //parsing out the json to be used in the html table
+
+
+                var tr = "";
+                    tr = "<tr><td>" + obj.time + "</td><td> " + obj.utcTime + "</td><td>" + obj.timeZone + "</td></tr>";
+                //adding the row to the top of the list after a button click
+                $('#tblTime tr:first').after(tr);
+
+
+               
+            }
+        };
+
+
+        xhttp.open("GET", "http://localhost:61997/api/currenttime", true); //changed this to match the local address of the api currenttime
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send();
+
+    }
+    function loadTimes() { //added a function to handle the data from the database
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var obj = JSON.parse( this.responseText);
+
+                var tr = "";
+                for (var i = 0; i < obj.length; i++) {
+                     tr = tr + "<tr><td>" + obj[i].time + "</td><td> " + obj[i].utcTime + "</td><td>" + obj[i].timeZone+"</td></tr>";
+                   
+                }
+                $('#tblTime tr:last').after(tr);
+            }
+        };
+
+
+        xhttp.open("GET", "http://localhost:61997/api/currenttime/getall", true); 
+        xhttp.setRequestHeader("Content-type", "application/json");
+        xhttp.send();
+
+    }
+</script>
+<style>
+    table {
+    }
+
+    td {
+        padding: 2px;
+        border: 1px solid #dadada;
+    }
+</style>
+<center>
+    <h2>AWH Clockwork Project @ViewData["Version"] on @ViewData["Runtime"]!</h2>
+
+    <button type="submit" onclick="UserAction()">Get the time</button>
+    <p id="showData"></p>
+    <table id="tblTime">
+        <tr>
+            <th>Time</th>
+            <th>UTCTime</th>
+            <th>TimeZone</th>
+        </tr>
+        
+    </table>
+
+</center>
